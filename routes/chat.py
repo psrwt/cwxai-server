@@ -11,20 +11,20 @@ from models.report_schmea import ReportCreate, ReportInDB
 from utils.json_converter import json_converter
 
 # === Azure Blob Storage Setup ===
-from azure.storage.blob import BlobServiceClient
+# from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
 import os
 load_dotenv()
 
-AZURE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-AZURE_CONTAINER_NAME = os.getenv("AZURE_STORAGE_CONTAINER_NAME", "userfiles")
-blob_service_client = BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
-container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME)
+# AZURE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+# AZURE_CONTAINER_NAME = os.getenv("AZURE_STORAGE_CONTAINER_NAME", "userfiles")
+# blob_service_client = BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
+# container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME)
 
-def upload_blob_data(blob_name: str, data: bytes):
-    blob_client = container_client.get_blob_client(blob_name)
-    blob_client.upload_blob(data, overwrite=True)
-    print(f"Uploaded blob: {blob_name}")
+# def upload_blob_data(blob_name: str, data: bytes):
+#     blob_client = container_client.get_blob_client(blob_name)
+#     blob_client.upload_blob(data, overwrite=True)
+#     print(f"Uploaded blob: {blob_name}")
 # === End Blob Setup ===
 
 chat_bp = Blueprint('chat', __name__)
