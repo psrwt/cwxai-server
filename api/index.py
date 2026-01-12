@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from utils.mongodb import client, logger
 from routes.auth import auth_bp
 from routes.user_info_route import user_bp
-# from routes.llm_calls import problem_bp
+from routes.llm_calls import problem_bp
 from routes.chat import chat_bp
 from routes.plans import plans_bp
 from routes.payments.create_order import create_order_bp
@@ -64,7 +64,7 @@ jwt = JWTManager(app)
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
-# app.register_blueprint(problem_bp, url_prefix='/api')
+app.register_blueprint(problem_bp, url_prefix='/api')
 app.register_blueprint(chat_bp, url_prefix='/chat')
 app.register_blueprint(create_order_bp, url_prefix='/create')
 app.register_blueprint(verify_payment_bp, url_prefix='/verify')

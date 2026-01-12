@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from services.llm_functions import get_detailed_problem_statement, get_required_evaluation_headings, generate_queries_per_heading, re_evaluate_problem_statement
-from models.idea_check import IdeaCreate, IdeaInDB
+# from services.llm_functions import get_detailed_problem_statement, get_required_evaluation_headings, generate_queries_per_heading, re_evaluate_problem_statement
+# from models.idea_check import IdeaCreate, IdeaInDB
 from utils.json_converter import json_converter
 from services.idea_service import create_idea, update_idea, delete_idea, get_ideas_by_userid
 from datetime import datetime, timezone
@@ -19,120 +19,120 @@ def protected_route():
     print(current_user)
     return jsonify({"message": "This is a protected route!"})
 
-@problem_bp.route('/get-problem-statement', methods=['POST'])
-@jwt_required()  # Ensure that the route is protected
-def problem_statement():
-    try:
-        current_user = get_jwt_identity()
-        print(current_user)
-        # Get the data from the request
-        data = request.get_json()
+# @problem_bp.route('/get-problem-statement', methods=['POST'])
+# @jwt_required()  # Ensure that the route is protected
+# def problem_statement():
+#     try:
+#         current_user = get_jwt_identity()
+#         print(current_user)
+#         # Get the data from the request
+#         data = request.get_json()
 
 
-        idea = data.get('idea')
-        title = data.get('title')
-        location = data.get('location')
-        slug = generate_slug(title)
+#         idea = data.get('idea')
+#         title = data.get('title')
+#         location = data.get('location')
+#         slug = generate_slug(title)
         
-        # If no idea is provided, return an error
-        if not idea:
-            return jsonify({"error": "Idea is required"}), 400
+#         # If no idea is provided, return an error
+#         if not idea:
+#             return jsonify({"error": "Idea is required"}), 400
 
-        # Call the function to get the detailed problem statement
-        result = get_detailed_problem_statement(idea,location)
-        print(result)
+#         # Call the function to get the detailed problem statement
+#         result = get_detailed_problem_statement(idea,location)
+#         print(result)
 
-        idea_data = IdeaCreate(
-        user_id=current_user,
-        problem=idea,
-        title = title,
-        slug = slug,
-        location=location,
-        problem_response=result,
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc)
-        # heading={"title": "Efficiency Improvement Ideas", "category": "Operations"},
-        # content={"details": "Detailed explanation on methodology and implementation."},
-        # summary={"key_points": ["Increase productivity", "Minimize waste", "Streamline processes"]}
-        )
-        new_idea = create_idea(idea_data)
-        print(new_idea["_id"])
-        print(new_idea["slug"])
-
-
-        # # Save the result to a problem.json file
-        # with open(f'{current_user}-{new_idea["_id"]}.json', 'w') as f:
-        #     json.dump(result, f, indent=4)
-
-        # Return the result as a JSON response
-        return jsonify(new_idea), 200
-
-    except Exception as e:
-        # Handle any exceptions and return an error
-        return jsonify({"error": str(e)}), 500
-
-@problem_bp.route('/re-evaluate', methods=['POST'])
-@jwt_required()  # Ensure the route is protected
-def re_evaluate_idea():
-    try:
-        # Get the current user from JWT identity
-        current_user = get_jwt_identity()
-        print(f"Current user: {current_user}")
-
-        # Get the data from the request
-        data = request.get_json()
-
-        idea = data.get('idea')
-        title = data.get('title')
-        location = data.get('location')
-        additional_input = data.get('additionalInput')
-        current_response = data.get('currentResponse')
-        userIdeasId = data.get('userideasId')
-
-        # If no idea is provided, return an error
-        if not idea:
-            return jsonify({"error": "Idea is required"}), 400
-
-        # Call the function to re-evaluate the problem statement based on new data
-        result = re_evaluate_problem_statement(idea, title, additional_input, current_response,location)
-
-        # Save the re-evaluated result to the database (adjust to your logic)
-        # idea_data = IdeaCreate(
-        #     user_id=current_user,
-        #     problem=idea,
-        #     title=title,
-        #     problem_response=result['content'],
-        #     created_at=datetime.now(timezone.utc)
-        # )
-        # new_idea = create_idea(idea_data)
-        # print(f"New idea created with ID: {new_idea['_id']}")
+#         idea_data = IdeaCreate(
+#         user_id=current_user,
+#         problem=idea,
+#         title = title,
+#         slug = slug,
+#         location=location,
+#         problem_response=result,
+#         created_at=datetime.now(timezone.utc),
+#         updated_at=datetime.now(timezone.utc)
+#         # heading={"title": "Efficiency Improvement Ideas", "category": "Operations"},
+#         # content={"details": "Detailed explanation on methodology and implementation."},
+#         # summary={"key_points": ["Increase productivity", "Minimize waste", "Streamline processes"]}
+#         )
+#         new_idea = create_idea(idea_data)
+#         print(new_idea["_id"])
+#         print(new_idea["slug"])
 
 
-        data_to_be_updated = {
-            "user_id": current_user,
-            "problem": idea,
-            "title": title,
-            "problem_response": result['content'],
-            "updated_at": datetime.now(timezone.utc)
-        }
+#         # # Save the result to a problem.json file
+#         # with open(f'{current_user}-{new_idea["_id"]}.json', 'w') as f:
+#         #     json.dump(result, f, indent=4)
 
-        try:
-            updated_userIdeas = update_idea(userIdeasId, data_to_be_updated)
-            # print(updated_userIdeas)
-            updated_userIdeas = json_converter(updated_userIdeas)
-            # print("\nUpdated the userIdea with user id : ", userIdeasId , " and user id is ", current_user, updated_userIdeas)
-        except Exception as e: 
-            print(f"Error updating idea : {e} ")
+#         # Return the result as a JSON response
+#         return jsonify(new_idea), 200
 
-        # with open(f'{current_user}-{userIdeasId}.json', 'w') as f:
-        #     json.dump(updated_userIdeas, f, indent=4, default=json_converter)
+#     except Exception as e:
+#         # Handle any exceptions and return an error
+#         return jsonify({"error": str(e)}), 500
 
-        # Return the updated result as a JSON response
-        return jsonify(updated_userIdeas), 200
+# @problem_bp.route('/re-evaluate', methods=['POST'])
+# @jwt_required()  # Ensure the route is protected
+# def re_evaluate_idea():
+#     try:
+#         # Get the current user from JWT identity
+#         current_user = get_jwt_identity()
+#         print(f"Current user: {current_user}")
 
-    except Exception as e:
-        # Handle any exceptions and return an error
-        return jsonify({"error": str(e)}), 500
+#         # Get the data from the request
+#         data = request.get_json()
+
+#         idea = data.get('idea')
+#         title = data.get('title')
+#         location = data.get('location')
+#         additional_input = data.get('additionalInput')
+#         current_response = data.get('currentResponse')
+#         userIdeasId = data.get('userideasId')
+
+#         # If no idea is provided, return an error
+#         if not idea:
+#             return jsonify({"error": "Idea is required"}), 400
+
+#         # Call the function to re-evaluate the problem statement based on new data
+#         result = re_evaluate_problem_statement(idea, title, additional_input, current_response,location)
+
+#         # Save the re-evaluated result to the database (adjust to your logic)
+#         # idea_data = IdeaCreate(
+#         #     user_id=current_user,
+#         #     problem=idea,
+#         #     title=title,
+#         #     problem_response=result['content'],
+#         #     created_at=datetime.now(timezone.utc)
+#         # )
+#         # new_idea = create_idea(idea_data)
+#         # print(f"New idea created with ID: {new_idea['_id']}")
+
+
+#         data_to_be_updated = {
+#             "user_id": current_user,
+#             "problem": idea,
+#             "title": title,
+#             "problem_response": result['content'],
+#             "updated_at": datetime.now(timezone.utc)
+#         }
+
+#         try:
+#             updated_userIdeas = update_idea(userIdeasId, data_to_be_updated)
+#             # print(updated_userIdeas)
+#             updated_userIdeas = json_converter(updated_userIdeas)
+#             # print("\nUpdated the userIdea with user id : ", userIdeasId , " and user id is ", current_user, updated_userIdeas)
+#         except Exception as e: 
+#             print(f"Error updating idea : {e} ")
+
+#         # with open(f'{current_user}-{userIdeasId}.json', 'w') as f:
+#         #     json.dump(updated_userIdeas, f, indent=4, default=json_converter)
+
+#         # Return the updated result as a JSON response
+#         return jsonify(updated_userIdeas), 200
+
+#     except Exception as e:
+#         # Handle any exceptions and return an error
+#         return jsonify({"error": str(e)}), 500
 
 
 
@@ -150,44 +150,44 @@ def user_ideas():
     except Exception as e: 
         return jsonify({"Error " : str(e)}), 500
 
-@problem_bp.route('/get-required-headings', methods = ['POST'])
-@jwt_required()
-def problem_required_headings():
-    try: 
-        current_user = get_jwt_identity()
-        print(current_user)
-        data = request.get_json()
-        detailed_problem_statement = data.get('problem_statement')
-        userIdeasId = data.get('userideasId')
-        location = data.get('location')
+# @problem_bp.route('/get-required-headings', methods = ['POST'])
+# @jwt_required()
+# def problem_required_headings():
+#     try: 
+#         current_user = get_jwt_identity()
+#         print(current_user)
+#         data = request.get_json()
+#         detailed_problem_statement = data.get('problem_statement')
+#         userIdeasId = data.get('userideasId')
+#         location = data.get('location')
         
-        # print(data)
-        if not detailed_problem_statement and userIdeasId: 
-            return jsonify({"Error : Problem statement or userIdeasId is missing"}), 400
+#         # print(data)
+#         if not detailed_problem_statement and userIdeasId: 
+#             return jsonify({"Error : Problem statement or userIdeasId is missing"}), 400
                 
-        headings = get_required_evaluation_headings(detailed_problem_statement, location)
+#         headings = get_required_evaluation_headings(detailed_problem_statement, location)
 
-        # data_to_be_updated = {
-        #     "headings" : headings
-        # }
-        # try:
-        #     # updated_userIdeas = update_idea(userIdeasId, data_to_be_updated)
-        #     # print(updated_userIdeas)
-        #     # print("\nUpdated the userIdea with user id : ", userIdeasId , " and user id is ", current_user, updated_userIdeas)
-        # except Exception as e: 
-        #     print(f"Error updating idea : {e} ")
+#         # data_to_be_updated = {
+#         #     "headings" : headings
+#         # }
+#         # try:
+#         #     # updated_userIdeas = update_idea(userIdeasId, data_to_be_updated)
+#         #     # print(updated_userIdeas)
+#         #     # print("\nUpdated the userIdea with user id : ", userIdeasId , " and user id is ", current_user, updated_userIdeas)
+#         # except Exception as e: 
+#         #     print(f"Error updating idea : {e} ")
 
-        # with open(f'{current_user}-{userIdeasId}.json', 'w') as f:
-        #     json.dump(updated_userIdeas, f, indent=4, default=json_converter)
+#         # with open(f'{current_user}-{userIdeasId}.json', 'w') as f:
+#         #     json.dump(updated_userIdeas, f, indent=4, default=json_converter)
 
-        return jsonify(headings), 200
-    except Exception as e: 
-        return jsonify({ "error": str(e)}), 500
+#         return jsonify(headings), 200
+#     except Exception as e: 
+#         return jsonify({ "error": str(e)}), 500
     
 
-@problem_bp.route('/get-queries-per-heading', methods = ['POST'])
-@jwt_required()
-def get_queries_per_heading():
+# @problem_bp.route('/get-queries-per-heading', methods = ['POST'])
+# @jwt_required()
+# def get_queries_per_heading():
     try:
         current_user = get_jwt_identity()
         print(current_user)
