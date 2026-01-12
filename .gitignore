@@ -1,0 +1,48 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# Node modules (if any leftover from previous setup)
+node_modules/
+
+# Logs
+*.log
+
+# Vercel build outputs (optional)
+.vercel/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/
+.VSCodeCounter/
+
+# JSON reports or temporary files
+output_all.json
+Business_Report_*.json
+Unified_Business_Report_*.json
+safeout.json
+
+# Docker (not needed for Vercel)
+Dockerfile
+
+# Celery logs and state files
+celerybeat-schedule
+celerybeat.pid
+
+# Package manager files (if not used)
+package-lock.json
+yarn.lock
+npm-debug.log
